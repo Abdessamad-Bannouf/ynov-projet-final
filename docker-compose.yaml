@@ -1,0 +1,61 @@
+services:
+  express-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile.express
+    image: myapp:latest
+    container_name: expressjs
+    ports:
+      - 3000:3000 # Mappe le port 3000 du conteneur au port 4000 de l'hôte
+    environment:
+      - DATABASE_URL:postgresql://postgres:postgres@postgres:5432/db?schema=public
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/usr/src/app # Synchronise le dossier actuel avec le conteneur
+      - /usr/src/app/node_modules # Évite les conflits entre node_modules local et conteneurisé
+    command: npm run dev # Lance l'application en mode développement avec nodemon
+
+  postgres:
+    build:
+      context: ./
+      dockerfile: Dockerfile.db
+    image: postgres:14
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    secrets:
+      - db_password
+    env_file:
+      - path: ./config/.env
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    secrets:
+      - pgadmin_password
+    env_file:
+      - path: ./config/.env
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+secrets:
+  db_password:
+    file: config/db_password.txt
+  pgadmin_password:
+    file: config/pgadmin_password.txt

@@ -1,0 +1,13 @@
+# Utiliser l'image officielle de PostgreSQL
+FROM postgres:14
+
+# Définir les variables d'environnement
+#ENV POSTGRES_USER=admin
+#ENV POSTGRES_PASSWORD=admin
+#ENV POSTGRES_DB=my_database
+
+# Copier un script d'initialisation SQL si nécessaire (facultatif)
+# COPY init.sql /docker-entrypoint-initdb.d/
+
+# Exposer le port par défaut de PostgreSQL
+EXPOSE 5432
