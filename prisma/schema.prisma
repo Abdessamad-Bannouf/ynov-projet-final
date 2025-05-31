@@ -1,0 +1,62 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String // "RH", "recruteur", etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  interviews Interview[]
+  Feedback   Feedback[]
+}
+
+model Candidate {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  phone      String?
+  cvUrl      String? // URL vers le CV
+  skills     String[] // Ex: ["Node", "React"]
+  experience Int // Années d’expérience
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  interviews Interview[]
+}
+
+model Interview {
+  id              Int      @id @default(autoincrement())
+  date            DateTime
+  location        String?
+  candidateId     Int
+  recruiterId     Int // L’ID du recruteur (User)
+  calendarEventId String? // ID de l’événement dans Google Calendar
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  candidate Candidate  @relation(fields: [candidateId], references: [id])
+  recruiter User       @relation(fields: [recruiterId], references: [id])
+  feedbacks Feedback[]
+}
+
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  interviewId Int
+  reviewerId  Int // L’utilisateur qui laisse le feedback
+  comments    String?
+  score       Int // Score sur 10 par exemple
+  createdAt   DateTime @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id])
+  reviewer  User      @relation(fields: [reviewerId], references: [id])
+}
