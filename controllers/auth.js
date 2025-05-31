@@ -1,17 +1,8 @@
-const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const user = require('../models/user');
 
-const router = express.Router();
-
-//TODO: mettre le JWT dans un fichier ignoré (par exemple le dossier config)
 const JWT_SECRET = 'votre_cle_secrete';
-
-// Simuler une base de données
-const users = [
-    { id: 1, email: 'test', password: '$2a$10$6ZQeDEPh.nCK.F44mZ1HSuPh8o4o6fnoBa/8pCbc3ab92vVwnNkvy' } // password: "123456"
-];
 
 // Inscription
 exports.postRegister = async (req, res, next) => {
@@ -44,7 +35,6 @@ exports.postRegister = async (req, res, next) => {
 
 // Connexion
 exports.postLogin = async (req, res, next) => {
-    //TODO : modifier le script pour que quand on utilise un mauvais mail, ça nous renvoie une erreur personnalisable
     const { email, password } = req.body;
 
     const currentUser = await user.findByEmail(email);
