@@ -3,6 +3,7 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
 const protectedRoutes = require('./routes/protected');
+const candidateRoutes = require('./routes/candidate');
 
 const app = express()
 const port = 3000
@@ -13,6 +14,7 @@ app.use(express.json());
 // Routes
 app.use('/api', authRoutes);
 app.use('/api', protectedRoutes);
+app.use('/api/candidate', candidateRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
