@@ -2,9 +2,11 @@ const express = require('express');
 
 const candidateController = require('../controllers/candidate');
 
+const upload = require('../middlewares/upload');
+
 const router = express.Router();
 
-router.post('/', candidateController.create);
+router.post('/', upload.single('cv'), candidateController.create);
 
 router.get('/', candidateController.getCandidates);
 
