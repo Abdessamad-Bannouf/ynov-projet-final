@@ -1,4 +1,4 @@
-const prisma = require('../util/prisma');
+const prisma = require('../utils/prisma');
 
 class Candidate {
     static async findAll() {
@@ -7,21 +7,6 @@ class Candidate {
 
     static async findById(id) {
         return prisma.candidate.findUnique({ where: { id: parseInt(id) } });
-    }
-
-    static async findByEmail(email) {
-        return prisma.candidate.findUnique({ where: { email } });
-    }
-
-    static async findEmailAndPassword(email, password) {
-        return prisma.candidate.findFirst({
-            where: {
-                AND: [
-                    { email: email },
-                    { password: password }
-                ]
-            }
-        });
     }
 
     static async create(data) {
