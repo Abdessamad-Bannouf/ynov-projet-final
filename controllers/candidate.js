@@ -2,7 +2,8 @@ const candidate = require('../models/candidate');
 
 exports.create = async(req, res) => {
     try {
-        const {name, email, phone, cvUrl, skills, experience} = req.body;
+        const {name, email, phone, skills, experience} = req.body;
+        const cvUrl = req.file ? req.file.path : null;
 
         const createCandidate = await candidate.create({
             "name": name,
@@ -10,7 +11,7 @@ exports.create = async(req, res) => {
             "phone": phone,
             "cvUrl": cvUrl,
             "skills": skills,
-            "experience": experience,
+            "experience": parseInt(experience),
 
         });
 
@@ -50,9 +51,17 @@ exports.getCandidateById = async(req, res) => {
 exports.update = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, phone, cvUrl, skills, experience } = req.body;
+        const { name, email, phone, skills, experience } = req.body;
+        const cvUrl = req.file ? req.file.path : null;
 
-        const updatedCandidate = await candidate.update(parseInt(id), {name, email, phone, cvUrl, skills, experience});
+        const updatedCandidate = await candidate.update(parseInt(id), {
+            "name": name,
+            'email': email,
+            "phone": phone,
+            "cvUrl": cvUrl,
+            "skills": skills,
+            "experience": parseInt(experience)
+        });
 
         res.status(200).json(updatedCandidate);
     } catch (error) {
