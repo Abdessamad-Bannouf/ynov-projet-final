@@ -1,4 +1,4 @@
-const prisma = require('../util/prisma');
+const prisma = require('../utils/prisma');
 
 class User {
     static async findAll() {
