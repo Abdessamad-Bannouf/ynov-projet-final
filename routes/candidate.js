@@ -4,11 +4,13 @@ const candidateController = require('../controllers/candidate');
 
 const upload = require('../middlewares/upload');
 
+const pagination = require('../middlewares/pagination');
+
 const router = express.Router();
 
 router.post('/', upload.single('cv'), candidateController.create);
 
-router.get('/', candidateController.getCandidates);
+router.get('/', pagination, candidateController.getCandidates);
 
 router.get('/:id', candidateController.getCandidateById);
 

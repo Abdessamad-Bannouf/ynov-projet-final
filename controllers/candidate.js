@@ -1,4 +1,5 @@
 const candidate = require('../models/candidate');
+const prisma = require('../utils/prisma');
 
 exports.create = async(req, res) => {
     try {
@@ -24,13 +25,31 @@ exports.create = async(req, res) => {
 
 exports.getCandidates = async (req, res) => {
     try {
-        const candidates = await candidate.findAll();
-        res.status(200).json(candidates);
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des candidats.' })
+        // Appel du middleware pour récupérer les valeurs.
+        const { page, pageSize, skip } = req.pagination;
+
+        const [candidates, total] = await Promise.all([
+            prisma.candidate.findMany({
+                skip,
+                take: pageSize,
+            }),
+            prisma.candidate.count(),
+        ]);
+
+        res.status(200).json({
+            data: candidates,
+            pagination: {
+                total,
+                page,
+                pageSize,
+                totalPages: Math.ceil(total / pageSize),
+            },
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des candidats.' });
     }
-}
+};
 
 exports.getCandidateById = async(req, res) => {
     try {
