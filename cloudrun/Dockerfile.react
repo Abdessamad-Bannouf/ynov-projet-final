@@ -1,0 +1,27 @@
+# Étape 1 : build de l'app
+FROM node:23 AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+# Étape 2 : exécution avec un serveur statique
+FROM node:23
+
+WORKDIR /app
+
+# Installer un serveur de fichiers statiques
+RUN npm install -g serve
+
+# Copier le build généré
+COPY --from=build /app/build ./build
+
+# Port injecté par Cloud Run
+EXPOSE 8080
+
+# Serve le dossier build
+CMD ["serve", "-s", "build", "-l", "8080"]
