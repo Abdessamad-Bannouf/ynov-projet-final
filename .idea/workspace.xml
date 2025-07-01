@@ -5,54 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71059f0d-a231-41a6-858b-6039a0e630b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cloudrun/Dockerfile.express" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cloudrun/Dockerfile.react" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cloudrun/terraform/.terraform.lock.hcl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cloudrun/terraform/main.tf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cloudrun/terraform/outputs.tf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cloudrun/terraform/variables.tf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/logo192.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/logo512.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/public/robots.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/App.test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/logo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/reportWebVitals.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/setupTests.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile.db" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Dockerfile.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile.express" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Dockerfile.express" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/candidate.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/candidate.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/authToken.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/middlewares/authToken.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/pagination.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/middlewares/pagination.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/upload.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/middlewares/upload.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/candidate.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/candidate.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/user.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/candidate.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/candidate.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/protected.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/protected.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/prisma.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/prisma.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +58,7 @@
       <updated>1751388575316</updated>
       <workItem from="1751388576562" duration="10304000" />
       <workItem from="1751399588713" duration="6525000" />
-      <workItem from="1751406451946" duration="543000" />
+      <workItem from="1751406451946" duration="866000" />
     </task>
     <servers />
   </component>
