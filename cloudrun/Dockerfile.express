@@ -1,0 +1,27 @@
+# Étape 1 : build des dépendances et Prisma
+FROM node:23 AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm install express --save nodemon body-parser @prisma/client jsonwebtoken bcryptjs cors body-parser multer dotenv googleapis
+
+RUN npx prisma generate
+
+# Étape 2 : image finale légère
+FROM node:23-slim
+
+WORKDIR /app
+
+COPY --from=build /app /app
+
+# ❌ Ne surtout pas fixer le port manuellement
+# ENV PORT=3000  ← À supprimer
+
+EXPOSE 8080
+
+CMD ["node", "index.js"]
