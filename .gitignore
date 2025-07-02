@@ -1,7 +1,25 @@
-/node_modules
-# Keep environment variables out of version control
-.env
-/config/
-/.idea
-/prisma/migrations
-/uploads/
+/cloudrun/terraform/.terraform/
+/cloudrun/terraform/*.tfstate
+/cloudrun/terraform/.terraform.lock.hcl
+/cloudrun/terraform/
+/cloudrun/terraform/secrets.tfvars
+/backend/node_modules
+/backend/.pnp
+backend/.pnp.js
+
+# testing
+/backend/coverage
+
+# production
+/backend/build
+
+# misc
+/backend/.DS_Store
+/backend/.env.local
+/backend/.env.development.local
+/backend/.env.test.local
+/backend/.env.production.local
+
+/backend/npm-debug.log*
+/backend/yarn-debug.log*
+/backend/yarn-error.log*
