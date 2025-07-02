@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71059f0d-a231-41a6-858b-6039a0e630b1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudrun/terraform/.terraform.lock.hcl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudrun/terraform/variables.tf" beforeDir="false" afterPath="$PROJECT_DIR$/cloudrun/terraform/variables.tf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +39,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;feature/setup-infra-google-cloud-terraform&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/abdes/OneDrive/Desktop/ynov-projet-final&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -59,6 +66,8 @@
       <workItem from="1751388576562" duration="10304000" />
       <workItem from="1751399588713" duration="6525000" />
       <workItem from="1751406451946" duration="866000" />
+      <workItem from="1751445271505" duration="3203000" />
+      <workItem from="1751450491468" duration="4627000" />
     </task>
     <servers />
   </component>

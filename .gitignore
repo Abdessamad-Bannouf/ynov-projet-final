@@ -1,6 +1,8 @@
 /cloudrun/terraform/.terraform/
 /cloudrun/terraform/*.tfstate
-/cloudrun/terraform/*.tfstate.backup
+/cloudrun/terraform/.terraform.lock.hcl
+/cloudrun/terraform/
+/cloudrun/terraform/secrets.tfvars
 /backend/node_modules
 /backend/.pnp
 backend/.pnp.js
