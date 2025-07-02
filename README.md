@@ -40,18 +40,12 @@ graph TD
 - ✅ Docker installé
 - ✅ `gcloud` CLI configurée et authentifiée
 
-### 2. Configuration
+### 2. Configurationte
 
-Créer un fichier `terraform.tfvars` :
+Créer un fichier `secrets.tfvars` :
 
 ```hcl
-project_id       = "ton-projet-gcp-id"
-region           = "europe-west9"
-
-image_url        = "europe-west9-docker.pkg.dev/ton-projet/containers/express-api:latest"
-react_image_url  = "europe-west9-docker.pkg.dev/ton-projet/containers/react-app:latest"
-
-db_password      = "postgres"
+db_password       = "postgres"
 ```
 
 ### 3. Déploiement
@@ -68,41 +62,16 @@ cd frontend
 docker build -f ../cloudrun/Dockerfile.react -t europe-west9-docker.pkg.dev/spry-effect-464207-v9/containers/react-app:latest .
 docker push europe-west9-docker.pkg.dev/spry-effect-464207-v9/containers/react-app:latest
 
-# Terraform : déploiement
-terraform init
-
-gcloud artifacts repositories create containers --repository-format=docker --location=europe-west9  --description="Dépôt Docker pour les conteneurs du projet"
-
-cd ../cloudrun/terraform/
-
-terraform init
-
-terraform apply
-
- gcloud auth configure-docker europe-west9-docker.pkg.dev
-
-gcloud artifacts repositories create containers --repository-format=docker --location=europe-west9  --description="Dépôt Docker pour les conteneurs du projet"
-
-cd backend :
-
-$ gcloud auth configure-docker europe-west9-docker.pkg.dev
-
+cd backend
 docker build -f ../cloudrun/Dockerfile.express -t europe-west9-docker.pkg.dev/spry-effect-464207-v9/containers/express-api:latest .
-
 docker push europe-west9-docker.pkg.dev/spry-effect-464207-v9/containers/express-api:latest
 
-cd ../cloudrun/terraform/
 
+
+# Terraform : déploiement
+cd cloudrun/terraform/
 terraform init
-
-terraform apply
-
- 
-
-# Appliquer l'infrastructure
-terraform apply
-```
-
+terraform apply -var-file="secrets.tfvars"
 ---
 
 ## 🔐 Sécurité
