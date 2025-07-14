@@ -1,7 +1,7 @@
 services:
   express-app:
     build:
-      context: ..
+      #context: ..
       dockerfile: Dockerfile.express
     image: myapp:latest
     container_name: expressjs
@@ -18,7 +18,7 @@ services:
 
   postgres:
     build:
-      context: ..
+      #context: ..
       dockerfile: Dockerfile.db
     image: postgres:14
     container_name: postgres
