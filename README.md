@@ -116,8 +116,138 @@ terraform apply -var-file="secrets.tfvars"
 │    └── utils/
 │    └── prisma/
 │       └── schema.prisma
-   
+
+
+## 🔐 Configuration Google API (OAUTH + Calendar)
+
+### 1. Accédez à Google Cloud Console.
+
+### 2. Créez un projet ou utilisez-en un existant.
+
+### 3. Activez l’API Google Calendar.
+
+### 4. Créez des identifiants OAuth 2.0 :
+
+### 5. Créez un fichier .env :
+
+```
+PORT=3000
+CLIENT_ID="YOUR_CLIENT_ID"
+CLIENT_SECRET="YOUR_CLIENT_SECRET"
+REDIRECT_URL="http://localhost:3000/api/calendar/oauth2callback"
 ```
 
+## 📂 Configuration du dossier config pour la database
+
+### - Créer un dossier "config" à la racine du dossier backend.
+
+#### - Ensuite dans ce dossier créer un fichier .env et rajouter les lignes suivantes :
+
+```
+POSTGRES_USER=postgres
+POSTGRES_DB=postgres
+PGADMIN_DEFAULT_EMAIL=admin@domain.com
+```
+
+### Créer un autre .env mais cette fois-ci à la racine du dossier backend lui-même (primordial pour que Prisma s'exécute correctement)
+- Copier cette ligne avec les valeurs suivantes :
+
+```
+DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres?schema=public"
+```
+
+### - Créer un fichier "db_password.txt" à la racine du projet.
+
+#### - Ensuite dans ce fichier ajouter la mot de passe de la base de données suivant :
+
+```
+postgres
+```
+
+### - Créer un fichier "pgadmin_password.txt" à la racine du projet.
+
+#### - Ensuite dans ce fichier ajouter le mot de passe de pg admin suivant :
+
+```
+postgres
+```
+
+
+## 🐳 Installation et exécution avec Docker
+
+### 1. Build des containers express / postgreSQL / pgAdmin
+
+```
+docker-compose build
+```
+
+### 2. Lancement des containers en détaché
+
+```
+docker-compose up -d
+```
+\
+
 ---
+## 🗃️ Base de données
+
+### Connexion au sein de pgAdmin
+
+Aller sur l'url :
+
+    http://localhost:5050
+
+Mettre comme login :
+
+    admin@domain.com
+
+Mettre le password correspondant.
+
+### Création de la database au sein de pgAdmin
+
+Ensuite sur l'interface pgAdmin cliquer sur Add New Server
+
+- Dans l'onglet général mettre un nom pour le serveur
+
+- Après cliquer sur l'onglet connection puis dans Host name mettre : postgres
+
+- Dans le champ port mettre : 5432
+
+- Dans le champ username mettre : postgres
+
+- Dans le champ password mettre le password correspondant
+
+### PRISMA ORM : migrations
+
+- Se connecter au container express js via la commande : docker exec -it expressjs bash
+- lancer la commande : npx prisma migrate dev --name init
+
+### Inscription
+
+- Aller sur l'url localhost:3000/register et s'inscrire
+- Se connecter via l'url localhost:3000/login
+
+---
+
+## 📌 Notes
+
+L'application est exposée sur le port 3000. Vous pouvez y accéder via http://localhost:3000.
+Si vous modifiez le code, techniquement les changements seront raffraichis automatiquement grâce à Nodemon.
+
+---
+
+## 🛠 Technologies utilisées
+
+- Node.js avec Express.js pour le backend.
+- PostgreSQL pour le SGBDR
+- pgAdmin pour l'interface de postgreSQL
+- PrismaORM pour tout ce qui est communication avec la base de données
+- ReactJS pour le front
+- Docker pour la conteneurisation.
+
+## Technologies
+***
+Une liste complète des technologies sur le projet :
+* [Node JS](https://nodejs.org/en/download/package-manager): Version 23
+
 

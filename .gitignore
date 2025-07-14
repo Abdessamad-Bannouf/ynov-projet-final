@@ -5,7 +5,9 @@
 /cloudrun/terraform/secrets.tfvars
 /backend/node_modules
 /backend/.pnp
-backend/.pnp.js
+/backend/.pnp.js
+/backend/.idea/
+/TODO.txt
 
 # testing
 /backend/coverage
@@ -23,3 +25,5 @@ backend/.pnp.js
 /backend/npm-debug.log*
 /backend/yarn-debug.log*
 /backend/yarn-error.log*
+
+/.idea/
