@@ -6,12 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="71059f0d-a231-41a6-858b-6039a0e630b1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudrun/terraform/.terraform.lock.hcl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudrun/terraform/variables.tf" beforeDir="false" afterPath="$PROJECT_DIR$/cloudrun/terraform/variables.tf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,23 +31,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/setup-infra-google-cloud-terraform&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/abdes/OneDrive/Desktop/ynov-projet-final&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "E:/Ynov/Projet final/ynov-projet-final/backend/controllers",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Ynov\Projet final\ynov-projet-final\backend\controllers" />
+      <recent name="E:\Ynov\Projet final\ynov-projet-final\backend\routes" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Ynov\Projet final\ynov-projet-final\backend" />
       <recent name="C:\Users\Abdessamad\Desktop\ynov-projet-final\cloudrun" />
       <recent name="C:\Users\Abdessamad\Desktop\ynov-projet-final" />
       <recent name="C:\Users\Abdessamad\Desktop\ynov-projet-final\backend" />
@@ -68,6 +71,10 @@
       <workItem from="1751406451946" duration="866000" />
       <workItem from="1751445271505" duration="3203000" />
       <workItem from="1751450491468" duration="4627000" />
+      <workItem from="1751972090568" duration="14007000" />
+      <workItem from="1752142289041" duration="4189000" />
+      <workItem from="1752157100229" duration="2654000" />
+      <workItem from="1752488910978" duration="9985000" />
     </task>
     <servers />
   </component>
