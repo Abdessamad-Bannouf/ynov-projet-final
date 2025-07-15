@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const protectedRoutes = require('./routes/protected');
 const candidateRoutes = require('./routes/candidate');
 const calendarRoutes = require('./routes/calendar');
+const feedBackRoutes = require('./routes/feedback')
 
 const app = express()
 const port = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use('/api', authRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api/candidate', candidateRoutes);
 app.use('/api/calendar', calendarRoutes);
+app.use('/api/feedback', feedBackRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!')

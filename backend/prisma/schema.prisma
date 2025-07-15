@@ -45,18 +45,18 @@ model Interview {
   updatedAt       DateTime @updatedAt
 
   candidate Candidate  @relation(fields: [candidateId], references: [id])
-  recruiter User       @relation(fields: [recruiterId], references: [id])
+  recruiter User       @relation(fields: [recruiterId], references: [id]) // Le recruteur est un user
   feedbacks Feedback[]
 }
 
 model Feedback {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   interviewId Int
   reviewerId  Int // L’utilisateur qui laisse le feedback
   comments    String?
-  score       Int // Score sur 10 par exemple
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  interview   Interview @relation(fields: [interviewId], references: [id])
+  reviewer    User      @relation(fields: [reviewerId], references: [id])
 
-  interview Interview @relation(fields: [interviewId], references: [id])
-  reviewer  User      @relation(fields: [reviewerId], references: [id])
+  @@unique([interviewId, reviewerId]) // feedback unique par utilisateur et entretien
 }
