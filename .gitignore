@@ -26,4 +26,8 @@
 /backend/yarn-debug.log*
 /backend/yarn-error.log*
 
+<<<<<<< Updated upstream
 /.idea/
+=======
+TODO.txt
+>>>>>>> Stashed changes

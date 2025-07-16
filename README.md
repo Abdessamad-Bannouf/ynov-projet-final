@@ -16,8 +16,8 @@ Ce projet déploie une architecture fullstack moderne sur **Google Cloud Platfor
 
 ```mermaid
 graph TD
-  A[Utilisateur] --> B[Cloud Run (React)]
-  B --> C[Cloud Run (Express API)]
+  A[Utilisateur] --> B[Cloud Run React]
+  B --> C[Cloud Run Express API]
   C --> D[Cloud SQL]
   C --> E[Secret Manager]
   F[Terraform] --> B
@@ -85,36 +85,35 @@ terraform apply -var-file="secrets.tfvars"
 ## 📂 Structure
 
 ```
-.
-├── main.tf
-├── variables.tf
-├── terraform.tfvars
-├── Dockerfile.express
-├── Dockerfile.react
-├── cloudrun/
-│   └── Terraform
-│        └── main.tf
-│        └── output.tf
-│        └── variables.ts
-│        └── Dockerfile.express
-│        └── Dockerfile.react 
-├── frontend/
-│   └── src/
-        └── App.css
-        └── App.js
-        └── index.css
-        └── index.js
-├── backend/
-│    └── config/
-│    └── controllers/
-│    └── middlewares/
-│    └── models/
-│    └── prisma/
-│    └── routes/
-│    └── scripts/
-│    └── controllers/
-│    └── utils/
-│    └── prisma/
+├── main.tf \
+├── variables.tf \
+├── terraform.tfvars \
+├── Dockerfile.express \
+├── Dockerfile.react \
+├── cloudrun/ \
+│   └── Terraform \
+│        └── main.tf \
+│        └── output.tf \
+│        └── variables.ts \
+│        └── Dockerfile.express \
+│        └── Dockerfile.react \
+├── frontend/ \
+│   └── src/ \
+        └── App.css \
+        └── App.js \
+        └── index.css \
+        └── index.js \
+├── backend/ \
+│    └── config/ \
+│    └── controllers/ \
+│    └── middlewares/ \
+│    └── models/ \
+│    └── prisma/ \
+│    └── routes/ \
+│    └── scripts/ \
+│    └── controllers/ \
+│    └── utils/ \
+│    └── prisma/ \
 │       └── schema.prisma
 
 
