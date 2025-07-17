@@ -10,9 +10,9 @@ const router = express.Router();
 
 router.post('/', upload.single('cv'), candidateController.create);
 
-router.get('/', pagination, candidateController.getCandidates);
+router.get('/', pagination, candidateController.showAll);
 
-router.get('/:id', candidateController.getCandidateById);
+router.get('/:id', candidateController.show);
 
 router.put('/:id', candidateController.update);
 
