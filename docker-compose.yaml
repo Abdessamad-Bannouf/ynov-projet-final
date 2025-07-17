@@ -1,7 +1,15 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.react
+    ports:
+      - "4000:80"
+    container_name: react-frontend
+
   express-app:
     build:
-      #context: ..
+      context: ./backend
       dockerfile: Dockerfile.express
     image: myapp:latest
     container_name: expressjs
@@ -12,13 +20,13 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./:/usr/src/app # Synchronise le dossier actuel avec le conteneur
+      - ./backend:/usr/src/app # Synchronise le dossier actuel avec le conteneur
       - /usr/src/app/node_modules # Évite les conflits entre node_modules local et conteneurisé
     command: npm run dev # Lance l'application en mode développement avec nodemon
 
   postgres:
     build:
-      #context: ..
+      context: ./backend
       dockerfile: Dockerfile.db
     image: postgres:14
     container_name: postgres
@@ -31,7 +39,7 @@ services:
     secrets:
       - db_password
     env_file:
-      - path: ./config/.env
+      - path: ./backend/config/.env
 
   pgadmin:
     image: dpage/pgadmin4
@@ -47,7 +55,7 @@ services:
     secrets:
       - pgadmin_password
     env_file:
-      - path: ./config/.env
+      - path: ./backend/config/.env
 volumes:
   postgres_data:
     driver: local
@@ -56,6 +64,6 @@ volumes:
 
 secrets:
   db_password:
-    file: config/db_password.txt
+    file: ./backend/config/db_password.txt
   pgadmin_password:
-    file: config/pgadmin_password.txt
+    file: ./backend/config/pgadmin_password.txt
