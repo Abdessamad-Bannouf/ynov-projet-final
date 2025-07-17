@@ -1,5 +1,4 @@
 const candidate = require('../models/candidate');
-const prisma = require('../utils/prisma');
 
 exports.create = async(req, res) => {
     try {
@@ -23,17 +22,17 @@ exports.create = async(req, res) => {
     }
 };
 
-exports.getCandidates = async (req, res) => {
+exports.showAll = async (req, res) => {
     try {
         // Appel du middleware pour récupérer les valeurs.
         const { page, pageSize, skip } = req.pagination;
 
         const [candidates, total] = await Promise.all([
-            prisma.candidate.findMany({
+             candidate.showAll({
                 skip,
                 take: pageSize,
             }),
-            prisma.candidate.count(),
+            candidate.count(),
         ]);
 
         res.status(200).json({
@@ -51,7 +50,7 @@ exports.getCandidates = async (req, res) => {
     }
 };
 
-exports.getCandidateById = async(req, res) => {
+exports.show = async(req, res) => {
     try {
         const { id } = req.params;
         const singleCandidate  = await candidate.findById(id);

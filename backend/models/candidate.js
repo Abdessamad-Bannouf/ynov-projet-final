@@ -1,7 +1,11 @@
-const prisma = require('../utils/prisma');
+const prisma = require('../prisma/prisma');
 
 class Candidate {
-    static async findAll() {
+    static async count() {
+        return prisma.candidate.count();
+    }
+
+    static async showAll() {
         return prisma.candidate.findMany();
     }
 
