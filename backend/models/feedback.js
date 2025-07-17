@@ -68,6 +68,12 @@ class Feedback {
     static async delete(id) {
         return prisma.feedback.delete({ where: { id: parseInt(id) } });
     }
+
+    static async deleteManyByInterviewId(interviewId) {
+        return prisma.feedback.deleteMany({
+            where: { interviewId: parseInt(interviewId) }
+        });
+    }
 }
 
 module.exports = Feedback;
