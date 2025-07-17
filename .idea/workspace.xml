@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< Updated upstream
     <list default="true" id="71059f0d-a231-41a6-858b-6039a0e630b1" name="Changes" comment="" />
+=======
+    <list default="true" id="71059f0d-a231-41a6-858b-6039a0e630b1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/feedback.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/feedback.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/feedback.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/feedback.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/feedback.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/feedback.js" afterDir="false" />
+    </list>
+>>>>>>> Stashed changes
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,13 +40,18 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+<<<<<<< Updated upstream
     "git-widget-placeholder": "feature/update-readme",
+=======
+    "git-widget-placeholder": "feat/interview-crud",
+>>>>>>> Stashed changes
     "last_opened_file_path": "E:/Ynov/Projet final/ynov-projet-final/backend/controllers",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "E:\\WebStorm 2023.2.3\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
