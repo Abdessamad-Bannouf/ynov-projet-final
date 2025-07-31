@@ -7,18 +7,17 @@ WORKDIR /usr/src/app
 # Étape 3 : Copier les fichiers package.json et package-lock.json
 COPY package*.json ./
 
-COPY . .
-
 # Étape 4 : Installer les dépendances
-
-RUN npm install express --save nodemon body-parser @prisma/client jsonwebtoken bcryptjs cors body-parser multer dotenv googleapis uuid express-session
+RUN npm install
 
 # Étape 5 : Copier le reste du code de l'application
 COPY . .
 
-# Étape 6 : Exposer le port sur lequel l'application tourne
+# Étape 6 : Générer les fichiers client de Prisma
+RUN npx prisma generate
+
+# Étape 7 : Exposer le port sur lequel l'application tourne
 EXPOSE 3000
 
-# Étape 7 : Commande pour lancer l'application
-RUN npx prisma generate
-CMD ["npm", "run", "dev"]
+# Étape 8 : Commande pour lancer l'application
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate dev --name init && npm run dev"]
