@@ -20,8 +20,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./backend:/usr/src/app # Synchronise le dossier actuel avec le conteneur
-      - /usr/src/app/node_modules # Évite les conflits entre node_modules local et conteneurisé
+      - ./backend:/usr/src/app:cached
     command: npm run dev # Lance l'application en mode développement avec nodemon
 
   postgres:
