@@ -11,6 +11,7 @@ function App() {
         <Routes>
             <Route path="/candidates" element={<CandidatesList />} />
             <Route path="/candidates/:id" element={<CandidateDetail />} />
+            <Route path="/interviews" element={<InterviewsList />} />
         </Routes>
       </BrowserRouter>
   );
