@@ -27,10 +27,10 @@ app.use(session({
 // Routes
 app.use('/api', authRoutes);
 app.use('/api', protectedRoutes);
-app.use('/api/candidate', candidateRoutes);
-app.use('/api/calendar', calendarRoutes);
-app.use('/api/feedback', feedBackRoutes);
-app.use('/api/interview', interviewRoutes);
+app.use('/api/candidates', candidateRoutes);
+app.use('/api/calendars', calendarRoutes);
+app.use('/api/feedbacks', feedBackRoutes);
+app.use('/api/interviews', interviewRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
