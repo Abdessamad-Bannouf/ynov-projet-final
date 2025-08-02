@@ -100,9 +100,9 @@ terraform apply -var-file="secrets.tfvars"
 ├── frontend/ \
 │   └── src/ \
 └── App.css \
-└── App.js \
+└── App.jsx \
 └── index.css \
-└── index.js \
+└── main.ts \
 ├── backend/ \
 │    └── config/ \
 │    └── controllers/ \
