@@ -1,0 +1,22 @@
+# Ne pas copier les dépendances locales (elles seront installées dans Docker)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Ne pas copier les fichiers de build (ils seront générés dans Docker)
+build
+dist
+
+# Ne pas copier les fichiers de config persos ou système
+.env
+.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Ne pas copier les fichiers spécifiques à l’IDE ou à l’OS
+.vscode
+.idea
+*.log
+Thumbs.db
