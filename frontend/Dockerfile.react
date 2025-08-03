@@ -1,13 +1,31 @@
-# Étape 1 : Build
-FROM node:18 AS build
+# Étape 1 : Construction de l'application avec Node.js
+FROM node:18 AS build  # Utilise l'image officielle Node.js version 18 pour builder l'application
+
+# Définit le dossier de travail dans le conteneur
 WORKDIR /app
+
+# Copie les fichiers package.json et package-lock.json pour installer les dépendances
 COPY package*.json ./
+
+# Installe les dépendances de l'application
 RUN npm install
+
+# Copie l'ensemble des fichiers du projet dans le conteneur
 COPY . .
+
+# Lance le script de build (généralement pour une app frontend comme Vue ou React)
 RUN npm run build
 
-# Étape 2 : Serveur Nginx
+# Étape 2 : Serveur de production avec Nginx | Utilise une image légère de Nginx pour servir l'application
 FROM nginx:stable-alpine
+
+# Copie les fichiers générés par le build dans le dossier HTML de Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# Remplace la configuration par défaut de Nginx par une configuration personnalisée
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+
+EXPOSE 80  # Ouvre le port 80 pour accéder à l'application
+
+# Démarre Nginx en mode non-démon (requis pour que le conteneur reste actif)
+CMD ["nginx", "-g", "daemon off;"]
