@@ -1,35 +1,47 @@
 const prisma = require('../prisma/prisma');
 
+class Interview {
+    static async findById(id) {
+        const parsedId = parseInt(id);
+        if (isNaN(parsedId)) throw new Error('Invalid ID');
 
-exports.findById = async(id) => {
-    return prisma.interview.findUnique({
-        where: { id: parseInt(id) }
-    });
+        return prisma.interview.findUnique({
+            where: { id: parsedId },
+        });
+    }
+
+    static async showAll() {
+        return prisma.interview.findMany({
+            include: {
+                candidate: true,
+                recruiter: true,
+                feedbacks: true,
+            },
+        });
+    }
+
+    static async create(data) {
+        return prisma.interview.create({ data });
+    }
+
+    static async update(id, data) {
+        const parsedId = parseInt(id);
+        if (isNaN(parsedId)) throw new Error('Invalid ID');
+
+        return prisma.interview.update({
+            where: { id: parsedId },
+            data,
+        });
+    }
+
+    static async delete(id) {
+        const parsedId = parseInt(id);
+        if (isNaN(parsedId)) throw new Error('Invalid ID');
+
+        return prisma.interview.delete({
+            where: { id: parsedId },
+        });
+    }
 }
 
-exports.showAll = async () => {
-    return await prisma.interview.findMany({
-        include: {
-            candidate: true,
-            recruiter: true,
-            feedbacks: true,
-        },
-    });
-};
-
-exports.create = async (data) => {
-    return await prisma.interview.create({ data });
-};
-
-exports.update = async (id, data) => {
-    return await prisma.interview.update({
-        where: { id: parseInt(id) },
-        data,
-    });
-};
-
-exports.delete = async (id) => {
-    return await prisma.interview.delete({
-        where: { id: parseInt(id) },
-    });
-};
+module.exports = Interview;
