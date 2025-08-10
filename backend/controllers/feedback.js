@@ -1,9 +1,20 @@
 const Feedback = require('../models/feedback');
+const Interview = require('../models/interview');
 
 exports.create = async (req, res) => {
     try {
         const { interviewId, reviewerId, comments } = req.body;
 
+        // Vérifie si l'entretien existe
+        const interview = await Interview.findById(interviewId);
+
+        if (!interview) {
+            return res.status(400).json({
+                error: "L'entretien spécifié n'existe pas.",
+            });
+        }
+
+        // Vérifie si un feedback existe déjà
         const existing = await Feedback.exists(interviewId, reviewerId);
 
         if (existing) {
@@ -12,11 +23,20 @@ exports.create = async (req, res) => {
             });
         }
 
+        // Crée le feedback
         const feedback = await Feedback.create({ interviewId, reviewerId, comments });
 
         res.status(201).json(feedback);
     } catch (error) {
         console.error(error);
+
+        // Gestion spécifique de l’erreur Prisma P2003 (clé étrangère)
+        if (error.code === 'P2003') {
+            return res.status(400).json({
+                error: "Impossible de créer le feedback : la clé étrangère est invalide (entretien ou recruteur inexistant).",
+            });
+        }
+
         res.status(500).json({ error: "Erreur lors de l'enregistrement du feedback." });
     }
 };
