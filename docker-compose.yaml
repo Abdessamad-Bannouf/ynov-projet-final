@@ -1,4 +1,24 @@
 services:
+  frontend-dev:
+    image: node:22-alpine
+    working_dir: /app
+    container_name: reactjs-dev
+    # Monte le code source et isole node_modules dans le conteneur
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - NODE_ENV=development
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173"
+    profiles: [ "dev" ]
+    depends_on:
+      - express-app
+
+  # --- PROD: ton image Nginx existante
   frontend:
     build:
       context: ./frontend
@@ -6,6 +26,7 @@ services:
     ports:
       - "4000:80"
     container_name: reactjs
+    profiles: [ "prod" ]
 
   express-app:
     build:
