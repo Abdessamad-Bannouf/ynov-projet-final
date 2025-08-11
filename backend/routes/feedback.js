@@ -6,7 +6,7 @@ const pagination = require('../middlewares/pagination');
 
 const router = express.Router();
 
-router.get('/interview/:interviewId', pagination, feedbackController.getFeedbacksByInterview);
+router.get('/interviews/:interviewId', pagination, feedbackController.getFeedbacksByInterview);
 router.get('/reviewer/:reviewerId', pagination, feedbackController.getFeedbacksByReviewer);
 router.get('/', pagination, feedbackController.showAll);
 
