@@ -1,7 +1,7 @@
 const prisma = require('../prisma/prisma');
 
 class Interview {
-    static async findById(id) {
+    static async show(id) {
         const parsedId = parseInt(id);
         if (isNaN(parsedId)) throw new Error('Invalid ID');
 
