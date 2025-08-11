@@ -11,19 +11,18 @@ export default function FeedbackSection({ interviewId, reviewerId }: {
     interviewId: number;
     reviewerId: number;
 }) {
-    console.log("Props reçues:", { interviewId, reviewerId });
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [comments, setComments] = useState("");
     const [alreadySubmitted, setAlreadySubmitted] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
-        fetchFeedbacks(interviewId).then((data) => {
-            setFeedbacks(data);
-            if (data.some((fb: any) => fb.reviewer?.id === reviewerId)) {
+        fetchFeedbacks(interviewId).then((arr) => {
+            setFeedbacks(Array.isArray(arr) ? arr : []);
+            if (arr?.some?.((fb: any) => fb?.reviewer?.id === reviewerId)) {
                 setAlreadySubmitted(true);
             }
-        });
+        }).catch((e)=>console.error('fetchFeedbacks error', e));
     }, [interviewId, reviewerId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -44,11 +43,13 @@ export default function FeedbackSection({ interviewId, reviewerId }: {
             <h2 className="text-xl font-bold mb-2">Feedbacks</h2>
 
             <ul className="mb-4">
-                {feedbacks.map((fb) => (
-                    <li key={fb.id} className="border-b py-2">
-                        <strong>{fb.reviewer?.email ?? "Anonyme"}</strong> : {fb.comments}
-                    </li>
-                ))}
+                {(feedbacks ?? [])
+                    .filter((fb: any) => !!fb?.reviewer)
+                    .map((fb: any) => (
+                        <li key={fb.id} className="border-b py-2">
+                            <strong>{fb.reviewer?.email ?? "Anonyme"}</strong> : {fb.comments}
+                        </li>
+                    ))}
             </ul>
 
             {!alreadySubmitted && (
@@ -64,6 +65,10 @@ export default function FeedbackSection({ interviewId, reviewerId }: {
                         Envoyer le feedback
                     </button>
                 </form>
+            )}
+
+            {(feedbacks ?? []).length === 0 && (
+                <p className="text-gray-500 mb-4">Aucun feedback pour le moment.</p>
             )}
 
             {successMessage && (
