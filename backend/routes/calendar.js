@@ -5,6 +5,7 @@ const calendarController = require('../controllers/calendar');
 const router = express.Router();
 
 router.get('/login', calendarController.login);
+router.get('/status', calendarController.status);
 
 router.get('/oauth2callback', calendarController.loginRedirect);
 
