@@ -7,6 +7,11 @@ class Interview {
 
         return prisma.interview.findUnique({
             where: { id: parsedId },
+            include: {
+                candidate: true,
+                recruiter: true,
+                feedbacks: true,
+            },
         });
     }
 
