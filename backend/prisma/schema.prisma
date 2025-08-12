@@ -35,14 +35,15 @@ model Candidate {
 }
 
 model Interview {
-  id              Int      @id @default(autoincrement())
-  date            DateTime
-  location        String?
-  candidateId     Int
-  recruiterId     Int // L’ID du recruteur (User)
-  calendarEventId String? // ID de l’événement dans Google Calendar
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  date             DateTime
+  location         String?
+  candidateId      Int
+  recruiterId      Int // L’ID du recruteur (User)
+  calendarEventId  String? // ID de l’événement dans Google Calendar
+  calendarHtmlLink String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   candidate Candidate  @relation(fields: [candidateId], references: [id])
   recruiter User       @relation(fields: [recruiterId], references: [id]) // Le recruteur est un user
