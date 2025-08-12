@@ -3,29 +3,18 @@ const Feedback = require('../models/feedback');
 
 exports.showAll = async (req, res) => {
     try {
-        const interviews = await Interview.showAll({
-            include: {
-                candidate: true,
-                recruiter: true,
-                feedbacks: true,
-            },
-        });
+        const interviews = await Interview.showAll();
         res.status(200).json(interviews);
     } catch (error) {
         res.status(500).json({ error: 'Erreur serveur lors de la récupération des entretiens' });
     }
-}
+};
 
 exports.show = async (req, res) => {
     const { id } = req.params;
-
     try {
         const interview = await Interview.show(id);
-
-        if (!interview) {
-            return res.status(404).json({ error: "Entretien non trouvé" });
-        }
-
+        if (!interview) return res.status(404).json({ error: "Entretien non trouvé" });
         res.status(200).json(interview);
     } catch (error) {
         console.error('Erreur lors de la récupération de l’entretien :', error);
@@ -40,7 +29,8 @@ exports.create = async (req, res) => {
             location,
             candidateId,
             recruiterId,
-            calendarEventId
+            calendarEventId,
+            calendarHtmlLink,
         } = req.body;
 
         const parsedDate = new Date(date);
@@ -53,7 +43,8 @@ exports.create = async (req, res) => {
             location,
             candidateId,
             recruiterId,
-            calendarEventId
+            calendarEventId: calendarEventId ?? null,
+            calendarHtmlLink: calendarHtmlLink ?? null,
         });
 
         res.status(201).json(interview);
@@ -70,7 +61,8 @@ exports.update = async (req, res) => {
         location,
         candidateId,
         recruiterId,
-        calendarEventId
+        calendarEventId,
+        calendarHtmlLink,
     } = req.body;
 
     try {
@@ -79,7 +71,8 @@ exports.update = async (req, res) => {
             location,
             candidateId,
             recruiterId,
-            calendarEventId
+            calendarEventId,
+            calendarHtmlLink,
         });
 
         res.status(200).json(updated);
@@ -94,23 +87,16 @@ exports.delete = async (req, res) => {
     const interviewId = parseInt(id);
 
     try {
-        // Vérifie si l’entretien existe
-        const existingInterview = await Interview.findById(interviewId);
-
+        const existingInterview = await Interview.show(interviewId);
         if (!existingInterview) {
             return res.status(404).json({ error: 'Entretien non trouvé' });
         }
 
-        // Supprime les feedbacks liés
         await Feedback.deleteManyByInterviewId(interviewId);
-
-        // Supprime l’entretien
         await Interview.delete(interviewId);
-
         res.status(204).send();
     } catch (error) {
         console.error('Erreur lors de la suppression de l’entretien :', error);
         res.status(500).json({ error: 'Erreur lors de la suppression de l’entretien' });
     }
 };
-
