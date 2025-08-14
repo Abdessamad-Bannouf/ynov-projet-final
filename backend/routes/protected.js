@@ -1,11 +1,8 @@
-const express = require('express');
-const authenticateToken = require('../middlewares/authToken');
+const router = require('express').Router();
+const { requireAuth } = require('../middlewares/auth');
 
-const router = express.Router();
-
-// Route protégée
-router.get('/protected', authenticateToken, (req, res) => {
-    res.json({ message: `Bienvenue ${req.user.username} ! Ceci est un contenu protégé.` });
+router.get('/protected/ping', requireAuth, (req, res) => {
+    res.json({ ok: true, user: req.auth });
 });
 
 module.exports = router;
