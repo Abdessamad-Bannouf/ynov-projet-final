@@ -6,7 +6,7 @@ exports.create = async (req, res) => {
         const { interviewId, reviewerId, comments } = req.body;
 
         // Vérifie si l'entretien existe
-        const interview = await Interview.findById(interviewId);
+        const interview = await Interview.show(interviewId);
 
         if (!interview) {
             return res.status(400).json({
