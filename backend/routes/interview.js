@@ -3,16 +3,18 @@ const express = require('express');
 const interviewController = require('../controllers/interview');
 
 const pagination = require('../middlewares/pagination');
+const { requireRole } = require('../middlewares/role');
+const { requireAuth } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.get('/:id', interviewController.show);
-router.get('/', pagination, interviewController.showAll);
+router.get('/:id', requireAuth, requireRole('rh','recruiter','admin'), interviewController.show);
+router.get('/', requireAuth, requireRole('rh','recruiter','admin'), pagination, interviewController.showAll);
 
-router.post('/', interviewController.create);
+router.post('/', requireAuth, requireRole('rh','recruiter','admin'),  interviewController.create);
 
-router.put('/:id', interviewController.update);
+router.put('/:id', requireAuth, requireRole('rh','recruiter','admin'), requireRole('rh','recruiter','admin'), interviewController.update);
 
-router.delete('/:id', interviewController.delete);
+router.delete('/:id', requireAuth, requireRole('rh','recruiter','admin'),  interviewController.delete);
 
 module.exports = router;
