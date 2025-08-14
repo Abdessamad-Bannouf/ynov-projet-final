@@ -1,52 +1,76 @@
-const jwt = require('jsonwebtoken');
+// controllers/auth.ts
 const bcrypt = require('bcryptjs');
-const user = require('../models/user');
+const User = require('../models/user');
+const { signAuthToken } = require('../middlewares/auth');
 
-const JWT_SECRET = 'votre_cle_secrete';
+exports.postRegister = async (req, res) => {
+    try {
+        const { email, password, role } = req.body;
 
-// Inscription
-exports.postRegister = async (req, res, next) => {
-    const { email, password, role } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'email et password requis' });
+        }
+        if (!role) {
+            return res.status(400).json({ message: 'role requis (ex: ADMIN, RH, RECRUITER)' });
+        }
 
-    // Vérifier si l’utilisateur existe déjà
-    //const existingUser = users.find(u => u.email === email);
-    const existingUser = await user.findByEmail(email);
-    if (existingUser) return res.status(400).json({ message: 'Utilisateur déjà existant' });
+        const existing = await User.findByEmail(email);
+        if (existing) return res.status(400).json({ message: 'Utilisateur déjà existant' });
 
-    // Hacher le mot de passe
-    const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Créer l’utilisateur
-    const newUser = {
-        email,
-        password: hashedPassword
-    };
+        const created = await User.create({
+            email,
+            password: hashedPassword,
+            role
+        });
 
-    await user.create({"email": email, "password": hashedPassword, "role": role});
+        const token = signAuthToken({ id: created.id, email: created.email, role: created.role });
 
-    // Générer le token
-    //const token = jwt.sign({ id: newUser.id, username: newUser.username }, JWT_SECRET, { expiresIn: '1h' });
-    const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(201).json({ message: 'Utilisateur créé', token });
+        return res.status(201).json({
+            message: 'Utilisateur créé',
+            token,
+            user: { id: created.id, email: created.email, role: created.role }
+        });
+    } catch (e) {
+        console.error('postRegister error:', e);
+        return res.status(500).json({ message: 'Erreur serveur' });
+    }
 };
 
+exports.postLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
+        const current = await User.findByEmail(email);
+        if (!current) return res.status(400).json({ message: 'Utilisateur non trouvé' });
 
-// Connexion
-exports.postLogin = async (req, res, next) => {
-    const { email, password } = req.body;
+        const valid = await bcrypt.compare(password, current.password);
+        if (!valid) return res.status(400).json({ message: 'Mot de passe invalide' });
 
-    const currentUser = await user.findByEmail(email);
-    if (!currentUser) return res.status(400).json({ message: 'Utilisateur non trouvé' });
+        const token = signAuthToken({ id: current.id, email: current.email, role: current.role });
 
-    const validPassword = await bcrypt.compare(password, currentUser.password);
-    if (!validPassword) return res.status(400).json({ message: 'Mot de passe invalide' });
+        return res.status(200).json({
+            message: 'Utilisateur connecté',
+            token,
+            user: { id: current.id, email: current.email, role: current.role }
+        });
+    } catch (e) {
+        console.error('postLogin error:', e);
+        return res.status(500).json({ message: 'Erreur serveur' });
+    }
+};
 
-    if(validPassword) {
-        //const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
-        const token = jwt.sign({ id: currentUser.id, email: currentUser.email }, JWT_SECRET, { expiresIn: '1h' });
-
-        res.status(200).json({ message: 'Utilisateur connecté', token });
+// Petit endpoint pour récupérer le profil courant
+exports.me = async (req, res) => {
+    try {
+        // req.auth alimenté par requireAuth
+        const { id } = req.auth;
+        const me = await User.findById(id);
+        if (!me) return res.status(404).json({ message: 'Utilisateur introuvable' });
+        return res.json({ id: me.id, email: me.email, role: me.role });
+    } catch (e) {
+        console.error('me error:', e);
+        return res.status(500).json({ message: 'Erreur serveur' });
     }
 };
