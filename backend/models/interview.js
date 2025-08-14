@@ -25,8 +25,8 @@ class Interview {
         });
     }
 
-    static async create(data) {
-        return prisma.interview.create({ data });
+    static async create(data, include) {
+        return prisma.interview.create({ data, include });
     }
 
     static async update(id, data) {
