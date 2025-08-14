@@ -99,6 +99,11 @@ terraform apply -var-file="secrets.tfvars"
 │        └── Dockerfile.react \
 ├── frontend/ \
 │   └── src/ \
+│       └──  api/ \
+│       └── auth/ \
+│       └── context/ \
+│       └── pages/ \
+│       └── components/ \
 └── App.css \
 └── App.jsx \
 └── index.css \
@@ -133,8 +138,11 @@ terraform apply -var-file="secrets.tfvars"
 PORT=3000
 CLIENT_ID="YOUR_CLIENT_ID"
 CLIENT_SECRET="YOUR_CLIENT_SECRET"
-REDIRECT_URL="http://localhost:3000/api/calendar/oauth2callback"
+REDIRECT_URL="http://localhost:3000/api/calendars/oauth2callback"
+JWT_SECRET="votre_cle_secrete"
+JWT_EXPIRES_IN="1h"
 ```
+
 
 ## 📂 Configuration du dossier config pour la database
 
@@ -183,9 +191,25 @@ docker-compose build
 ### 2. Lancement des containers en détaché
 
 ```
-docker-compose up -d
+docker-compose up -d --build
+docker compose --profile dev up -d --build 
 ```
 \
+
+
+---
+## 🔑 Authentification JWT
+
+POST /register → inscription avec email, password, role
+
+POST /login → connexion, retourne un token JWT
+
+Le token est stocké côté frontend (localStorage) et envoyé dans Authorization: Bearer <token> pour toutes les requêtes API
+
+RoleGate côté React pour cacher ou montrer des pages selon le rôle
+
+requireAuth / requireRole côté backend pour protéger les routes
+
 
 ---
 ## 🗃️ Base de données
@@ -218,12 +242,16 @@ Ensuite sur l'interface pgAdmin cliquer sur Add New Server
 
 ### PRISMA ORM : migrations
 
-- Se connecter au container express js via la commande : docker exec -it expressjs bash
-- lancer la commande : npx prisma migrate dev --name init
+- lancer les commandes : 
+
+```
+docker exec -it expressjs bash
+npx prisma migrate dev --name init
+```
 
 ### Inscription
 
-- Aller sur l'url localhost:3000/register et s'inscrire
+- Aller sur l'url localhost:4000/register et s'inscrire
 - Se connecter via l'url localhost:3000/login
 
 ---
