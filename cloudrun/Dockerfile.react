@@ -1,27 +1,32 @@
-# Étape 1 : build de l'app
-FROM node:23 AS build
+# syntax=docker/dockerfile:1
 
-WORKDIR /app
+# Étape 1 : build de l'app (depuis /frontend)
+FROM node:20 AS build
+WORKDIR /app/frontend
 
-COPY package*.json ./
-RUN npm install
+# 1) deps
+COPY frontend/package*.json ./
+RUN npm ci
 
-COPY . .
+# 2) sources
+COPY frontend/ ./
+
+# 3) build (CRA -> build/, Vite -> dist/)
 RUN npm run build
 
-# Étape 2 : exécution avec un serveur statique
-FROM node:23
+# 4) normaliser la sortie vers /out (supporte build/ OU dist/)
+RUN if [ -d build ]; then mv build /out; \
+    elif [ -d dist ]; then mv dist /out; \
+    else echo "❌ Aucun dossier de build trouvé (ni build/ ni dist/)" && ls -la && exit 1; fi
 
+# Étape 2 : runtime statique léger
+FROM node:20-slim AS runtime
 WORKDIR /app
+RUN npm i -g serve
 
-# Installer un serveur de fichiers statiques
-RUN npm install -g serve
+# Copier le résultat de build normalisé
+COPY --from=build /out ./www
 
-# Copier le build généré
-COPY --from=build /app/build ./build
-
-# Port injecté par Cloud Run
+# Cloud Run impose $PORT
 EXPOSE 8080
-
-# Serve le dossier build
-CMD ["serve", "-s", "build", "-l", "8080"]
+CMD ["sh","-c","serve -s www -l ${PORT:-8080}"]
