@@ -9,6 +9,10 @@ permissions:
   id-token: write      # requis pour le WIF
   contents: read
 
+# ✅ évite le double slash en tag si la variable GHA n'est pas définie
+env:
+  GCP_PROJECT: spry-effect-464207-v9
+
 jobs:
   backend:
     runs-on: ubuntu-latest
@@ -39,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🔎 A) Debug OIDC claims (GitHub → Google)
+      # 🔎 Debug OIDC claims (GitHub → Google)
       - name: Debug OIDC claims (GitHub → Google)
         run: |
           set -euo pipefail
@@ -62,8 +66,7 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
         with:
-          export_default_credentials: true
-          project_id: spry-effect-464207-v9   # important
+          project_id: spry-effect-464207-v9
 
       # debug temporaire pour vérifier l'identité active & le projet
       - run: gcloud auth list && gcloud config list
@@ -78,7 +81,8 @@ jobs:
           context: .
           file: cloudrun/Dockerfile.express
           push: true
-          tags: europe-west9-docker.pkg.dev/${{ vars.GCP_PROJECT }}/containers/express-api:latest
+          # ✅ utilise l'env ci-dessus (et non vars.) pour éviter un tag vide
+          tags: europe-west9-docker.pkg.dev/${{ env.GCP_PROJECT }}/containers/express-api:latest
 
       - name: Build & push frontend
         uses: docker/build-push-action@v6
@@ -86,4 +90,4 @@ jobs:
           context: .
           file: cloudrun/Dockerfile.react
           push: true
-          tags: europe-west9-docker.pkg.dev/${{ vars.GCP_PROJECT }}/containers/react-app:latest
+          tags: europe-west9-docker.pkg.dev/${{ env.GCP_PROJECT }}/containers/react-app:latest
