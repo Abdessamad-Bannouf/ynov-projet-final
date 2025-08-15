@@ -42,6 +42,8 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/962157203540/locations/global/workloadIdentityPools/my-pool/providers/my-github
+          # force l'audience attendue par STS (évite le mismatch https:// vs //)
+          audience: //iam.googleapis.com/projects/962157203540/locations/global/workloadIdentityPools/my-pool/providers/my-github
           service_account: ci-deployer@spry-effect-464207-v9.iam.gserviceaccount.com
           project_id: spry-effect-464207-v9
 
@@ -50,7 +52,7 @@ jobs:
           export_default_credentials: true
           project_id: spry-effect-464207-v9   # important
 
-      # 👇 petit debug temporaire pour vérifier l'identité active & le projet
+      # debug temporaire pour vérifier l'identité active & le projet
       - run: gcloud auth list && gcloud config list
 
       - run: gcloud auth configure-docker europe-west9-docker.pkg.dev --quiet
