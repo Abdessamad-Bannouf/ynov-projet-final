@@ -1,36 +1,28 @@
 # syntax=docker/dockerfile:1
 
-# Étape deps: installe les dépendances du dossier backend
+# Étape 1: deps + Prisma client
 FROM node:20 AS deps
 WORKDIR /app/backend
+# n'envoie que les manifests pour tirer un cache efficace
 COPY backend/package*.json ./
 RUN npm ci
-
-# Étape build: copie le code, génère Prisma et build (si script build existe)
-FROM node:20 AS build
-WORKDIR /app/backend
-COPY --from=deps /app/backend/node_modules ./node_modules
-COPY backend/ ./
+# Prisma client (nécessite le schema)
+COPY backend/prisma ./prisma
 RUN npx prisma generate
-# essaie de builder si tu as du TypeScript (sinon cette ligne est ignorée)
-RUN npm run build || echo "no build script, skipping"
 
-# Étape prod-deps: deps prod uniquement pour runtime léger
-FROM node:20 AS prod-deps
-WORKDIR /app/backend
-COPY backend/package*.json ./
-RUN npm ci --omit=dev
-
-# Image finale
+# Étape 2: image runtime légère
 FROM node:20-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app/backend
-# deps prod + artefacts utiles
-COPY --from=prod-deps /app/backend/node_modules ./node_modules
-COPY --from=build /app/backend/package*.json ./
-COPY --from=build /app/backend/prisma ./prisma
-# si tu as compilé: copie dist, sinon ton app devra avoir un start qui sait lancer src/
-COPY --from=build /app/backend/dist ./dist
+
+# deps prod + prisma client
+COPY --from=deps /app/backend/node_modules ./node_modules
+
+# code de l'app (sans node_modules)
+COPY backend/ ./
+
+# Cloud Run fournit $PORT → l'app doit écouter process.env.PORT
 EXPOSE 8080
-# utilise ton script "start" du package.json (ex: "node dist/main.js")
+
+# utilise le script "start" de ton package.json
 CMD ["npm","start"]
