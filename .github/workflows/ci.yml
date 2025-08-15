@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  id-token: write      # requis pour le WIF
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint --if-present
+      - run: npm test --if-present
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npm run build
+
+  docker:
+    # n'exécute ce job que sur push vers main (pas sur PR/forks)
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 🔎 A) Debug OIDC claims (GitHub → Google)
+      - name: Debug OIDC claims (GitHub → Google)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y && sudo apt-get install -y jq
+          URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=//iam.googleapis.com/projects/962157203540/locations/global/workloadIdentityPools/my-pool/providers/my-github"
+          TOKEN_JSON=$(curl -sS -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "$URL")
+          echo "Raw ID token response keys:" && echo "$TOKEN_JSON" | jq 'keys'
+          TOKEN=$(echo "$TOKEN_JSON" | jq -r '.value')
+          echo "Decoded OIDC payload ↓"
+          PAYLOAD=$(echo "$TOKEN" | cut -d. -f2 | tr '_-' '/+' | base64 -d 2>/dev/null || true)
+          echo "$PAYLOAD" | jq .
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/962157203540/locations/global/workloadIdentityPools/my-pool/providers/my-github
+          # force l'audience attendue par STS (évite le mismatch https:// vs //)
+          audience: "//iam.googleapis.com/projects/962157203540/locations/global/workloadIdentityPools/my-pool/providers/my-github"
+          service_account: ci-deployer@spry-effect-464207-v9.iam.gserviceaccount.com
+          project_id: spry-effect-464207-v9
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          export_default_credentials: true
+          project_id: spry-effect-464207-v9   # important
+
+      # debug temporaire pour vérifier l'identité active & le projet
+      - run: gcloud auth list && gcloud config list
+
+      - run: gcloud auth configure-docker europe-west9-docker.pkg.dev --quiet
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cloudrun/Dockerfile.express
+          push: true
+          tags: europe-west9-docker.pkg.dev/${{ vars.GCP_PROJECT }}/containers/express-api:latest
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cloudrun/Dockerfile.react
+          push: true
+          tags: europe-west9-docker.pkg.dev/${{ vars.GCP_PROJECT }}/containers/react-app:latest

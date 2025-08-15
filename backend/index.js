@@ -18,6 +18,11 @@ app.use(cors({
     methods: ['GET','POST','PATCH','DELETE','OPTIONS'],
     allowedHeaders: ['Content-Type','Authorization']
 }));
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    next()
+})
 app.use(express.json());
 app.use(session({
     secret: '123', // TODO: à remplacer par un vrai secret

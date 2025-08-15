@@ -1,5 +1,7 @@
 const Interview = require('../models/interview');
 const Feedback = require('../models/feedback');
+const Candidate = require('../models/candidate');
+const prisma = require('../prisma/prisma');
 
 exports.showAll = async (req, res) => {
     try {
@@ -24,33 +26,51 @@ exports.show = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        const {
-            date,
-            location,
-            candidateId,
-            recruiterId,
-            calendarEventId,
-            calendarHtmlLink,
-        } = req.body;
+        const { date, location, candidateEmail } = req.body;
 
+        // Valide la date
         const parsedDate = new Date(date);
-        if (!date || isNaN(parsedDate)) {
+        if (!date || Number.isNaN(parsedDate.getTime())) {
             return res.status(400).json({ error: "Le champ 'date' est requis et doit être une date valide." });
         }
 
-        const interview = await Interview.create({
-            date: parsedDate,
-            location,
-            candidateId,
-            recruiterId,
-            calendarEventId: calendarEventId ?? null,
-            calendarHtmlLink: calendarHtmlLink ?? null,
-        });
+        // Récupère le recruteur depuis le JWT
+        if (!req.auth?.id) {
+            return res.status(401).json({ error: "Non authentifié" });
+        }
+        const recruiterId = Number(req.auth.id);
 
-        res.status(201).json(interview);
+        // Résout l'ID du candidat à partir de l'email
+        if (!candidateEmail) {
+            return res.status(400).json({ error: "Le champ 'candidateEmail' est requis." });
+        }
+        const candidate = await prisma.candidate.findUnique({
+            where: { email: candidateEmail },
+            select: { id: true, email: true, name: true },
+        });
+        if (!candidate) {
+            return res.status(400).json({ error: "Candidat introuvable pour cet email." });
+        }
+
+        // Crée l’entretien
+        const interview = await Interview.create(
+            {
+                date: parsedDate,
+                location: location ?? null,
+                candidateId: candidate.id,
+                recruiterId,
+                calendarEventId: null,
+            },
+            {
+                candidate: { select: { id: true, name: true, email: true } },
+                recruiter: { select: { id: true, email: true } },
+            }
+        );
+
+        return res.status(201).json({ data: interview });
     } catch (error) {
         console.error('Erreur lors de la création de l’entretien :', error);
-        res.status(500).json({ error: 'Erreur serveur lors de la création de l’entretien' });
+        return res.status(500).json({ error: 'Erreur serveur lors de la création de l’entretien' });
     }
 };
 
