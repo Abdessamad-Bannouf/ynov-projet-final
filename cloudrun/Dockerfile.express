@@ -1,27 +1,36 @@
-# Étape 1 : build des dépendances et Prisma
-FROM node:23 AS build
+# syntax=docker/dockerfile:1
 
-WORKDIR /app
+# Étape deps: installe les dépendances du dossier backend
+FROM node:20 AS deps
+WORKDIR /app/backend
+COPY backend/package*.json ./
+RUN npm ci
 
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-
-RUN npm install express --save nodemon body-parser @prisma/client jsonwebtoken bcryptjs cors body-parser multer dotenv googleapis
-
+# Étape build: copie le code, génère Prisma et build (si script build existe)
+FROM node:20 AS build
+WORKDIR /app/backend
+COPY --from=deps /app/backend/node_modules ./node_modules
+COPY backend/ ./
 RUN npx prisma generate
+# essaie de builder si tu as du TypeScript (sinon cette ligne est ignorée)
+RUN npm run build || echo "no build script, skipping"
 
-# Étape 2 : image finale légère
-FROM node:23-slim
+# Étape prod-deps: deps prod uniquement pour runtime léger
+FROM node:20 AS prod-deps
+WORKDIR /app/backend
+COPY backend/package*.json ./
+RUN npm ci --omit=dev
 
-WORKDIR /app
-
-COPY --from=build /app /app
-
-# ❌ Ne surtout pas fixer le port manuellement
-# ENV PORT=3000  ← À supprimer
-
+# Image finale
+FROM node:20-slim AS runtime
+ENV NODE_ENV=production
+WORKDIR /app/backend
+# deps prod + artefacts utiles
+COPY --from=prod-deps /app/backend/node_modules ./node_modules
+COPY --from=build /app/backend/package*.json ./
+COPY --from=build /app/backend/prisma ./prisma
+# si tu as compilé: copie dist, sinon ton app devra avoir un start qui sait lancer src/
+COPY --from=build /app/backend/dist ./dist
 EXPOSE 8080
-
-CMD ["node", "main.ts"]
+# utilise ton script "start" du package.json (ex: "node dist/main.js")
+CMD ["npm","start"]
