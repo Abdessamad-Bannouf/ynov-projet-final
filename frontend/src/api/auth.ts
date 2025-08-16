@@ -1,9 +1,14 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+import api from "./api";
+
+export async function register(payload: { email: string; password: string; role: 'admin'|'rh'|'recruiter'|'user' }) {
+    const res = await api.post("/register", payload);
+    return res.data as { message?: string; token: string };
+}
 
 export async function login(email: string, password: string) {
-    const res = await axios.post(`${API_URL}/login`, { email, password });
+    const res = await api.post(`/login`, { email, password });
     return res.data; // { message, token }
 }
 
