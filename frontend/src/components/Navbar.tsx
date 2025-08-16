@@ -40,12 +40,20 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-2">
                     {!token ? (
-                        <NavLink
-                            to="/login"
-                            className="px-3 py-2 rounded-md text-sm bg-blue-600 text-white"
-                        >
-                            Se connecter
-                        </NavLink>
+                        <>
+                            <NavLink
+                                to="/register"
+                                className="px-3 py-2 rounded-md text-sm hover:bg-gray-100 text-gray-800"
+                            >
+                                S’inscrire
+                            </NavLink>
+                            <NavLink
+                                to="/login"
+                                className="px-3 py-2 rounded-md text-sm bg-blue-600 text-white"
+                            >
+                                Se connecter
+                            </NavLink>
+                        </>
                     ) : (
                         <button
                             onClick={handleLogout}
