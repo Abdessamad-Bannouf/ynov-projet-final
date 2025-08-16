@@ -1,0 +1,839 @@
+openapi: 3.0.3
+info:
+  title: ATS API
+  version: 1.0.0
+  description: >
+    API d’un mini ATS (authentification, candidats, entretiens, feedbacks, intégration Google Calendar).
+    Les endpoints protégés requièrent un **JWT Bearer**.  
+    Les routes Calendar `/create`, `/update`, `/delete` requièrent à la fois le JWT (rôles) et un compte Google connecté via `/calendars/login` + callback.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local
+
+tags:
+  - name: Auth
+  - name: Candidates
+  - name: Interviews
+  - name: Feedbacks
+  - name: Calendars
+
+paths:
+  /me:
+    get:
+      tags: [Auth]
+      summary: Profil courant
+      description: Retourne l’utilisateur courant à partir du JWT.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Utilisateur courant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Utilisateur introuvable
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Connexion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLoginRequest'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /register:
+    post:
+      tags: [Auth]
+      summary: Inscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRegisterRequest'
+      responses:
+        '201':
+          description: Compte créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400':
+          description: Entrées invalides ou utilisateur existant
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  # ===== CANDIDATES =====
+  /candidates:
+    get:
+      tags: [Candidates]
+      summary: Lister les candidats (paginé)
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: Liste paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCandidates'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    post:
+      tags: [Candidates]
+      summary: Créer un candidat (upload CV)
+      description: Upload multipart avec le champ fichier **cv**.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name, email, phone, skills, experience]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                skills:
+                  type: string
+                  description: Chaîne libre (ex. "Node.js, React, SQL")
+                experience:
+                  type: integer
+                cv:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Candidat créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /candidates/{id}:
+    get:
+      tags: [Candidates]
+      summary: Récupérer un candidat
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '404':
+          description: Non trouvé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    put:
+      tags: [Candidates]
+      summary: Mettre à jour un candidat
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                skills: { type: string }
+                experience: { type: integer }
+                cv:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    delete:
+      tags: [Candidates]
+      summary: Supprimer un candidat (et ses entretiens/feedbacks liés)
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: Supprimé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  # ===== INTERVIEWS =====
+  /interviews:
+    get:
+      tags: [Interviews]
+      summary: Lister les entretiens (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: Liste des entretiens
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Interview' }
+        '401':
+          description: Non authentifié / rôles insuffisants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    post:
+      tags: [Interviews]
+      summary: Créer un entretien (protégé)
+      description: Requiert un JWT et un rôle `rh|recruiter|admin`. Renseigner `candidateEmail`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [date, candidateEmail]
+              properties:
+                date:
+                  type: string
+                  format: date-time
+                  example: "2025-08-20T13:30:00.000Z"
+                location:
+                  type: string
+                  nullable: true
+                candidateEmail:
+                  type: string
+                  format: email
+      responses:
+        '201':
+          description: Créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Interview' }
+        '400':
+          description: Entrée invalide
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /interviews/{id}:
+    get:
+      tags: [Interviews]
+      summary: Récupérer un entretien (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '401':
+          description: Non authentifié / rôles insuffisants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Non trouvé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    put:
+      tags: [Interviews]
+      summary: Mettre à jour un entretien (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date: { type: string, format: date-time }
+                location: { type: string }
+                candidateId: { type: integer }
+                recruiterId: { type: integer }
+                calendarEventId: { type: string, nullable: true }
+                calendarHtmlLink: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Mis à jour
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Interview' }
+        '401':
+          description: Non authentifié / rôles insuffisants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    delete:
+      tags: [Interviews]
+      summary: Supprimer un entretien (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '204':
+          description: Supprimé
+        '401':
+          description: Non authentifié / rôles insuffisants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Non trouvé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  # ===== FEEDBACKS =====
+  /feedbacks:
+    get:
+      tags: [Feedbacks]
+      summary: Lister tous les feedbacks (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Feedback' }
+        '401':
+          description: Non authentifié / rôles insuffisants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    post:
+      tags: [Feedbacks]
+      summary: Créer un feedback (protégé)
+      description: Un même reviewer ne peut créer qu’un feedback par entretien.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [interviewId, reviewerId, comments]
+              properties:
+                interviewId: { type: integer }
+                reviewerId: { type: integer }
+                comments: { type: string }
+      responses:
+        '201':
+          description: Créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Feedback' }
+        '400':
+          description: Clé étrangère invalide / entretien inexistant
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Doublon (feedback déjà existant pour cet entretien et ce reviewer)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /feedbacks/{id}:
+    get:
+      tags: [Feedbacks]
+      summary: Récupérer un feedback (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Feedback' }
+        '404':
+          description: Non trouvé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    put:
+      tags: [Feedbacks]
+      summary: Mettre à jour un feedback (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comments]
+              properties:
+                comments: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Feedback' }
+
+    delete:
+      tags: [Feedbacks]
+      summary: Supprimer un feedback (protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '204':
+          description: Supprimé
+
+  /feedbacks/interviews/{interviewId}:
+    get:
+      tags: [Feedbacks]
+      summary: Feedbacks d’un entretien (paginé, public)
+      parameters:
+        - name: interviewId
+          in: path
+          required: true
+          schema: { type: integer }
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFeedbacks'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /feedbacks/reviewer/{reviewerId}:
+    get:
+      tags: [Feedbacks]
+      summary: Feedbacks d’un reviewer (paginé, protégé)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reviewerId
+          in: path
+          required: true
+          schema: { type: integer }
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFeedbacks'
+        '401':
+          description: Non authentifié / rôles insuffisants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  # ===== CALENDARS (Google) =====
+  /calendars/login:
+    get:
+      tags: [Calendars]
+      summary: Démarre l’OAuth Google (redirection)
+      responses:
+        '302':
+          description: Redirection vers Google OAuth consent screen
+
+  /calendars/status:
+    get:
+      tags: [Calendars]
+      summary: Statut de connexion Google
+      responses:
+        '200':
+          description: Indique si des tokens Google sont présents en session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+
+  /calendars/oauth2callback:
+    get:
+      tags: [Calendars]
+      summary: Callback OAuth Google
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '302':
+          description: Redirection front (success=0|1)
+
+  /calendars/create:
+    post:
+      tags: [Calendars]
+      summary: Créer un événement Google Calendar (protégé + Google connecté)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [summary, start, end]
+              properties:
+                summary: { type: string }
+                description: { type: string }
+                location:
+                  type: string
+                  description: Par défaut "Google Meet"
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+                attendees:
+                  type: array
+                  items:
+                    type: string
+                    format: email
+                interviewId:
+                  type: integer
+                  description: Pour lier l’event à l’entretien (sauvegarde eventId/htmlLink)
+      responses:
+        '201':
+          description: Événement créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  eventId: { type: string, nullable: true }
+                  htmlLink: { type: string, nullable: true }
+                  hangoutLink: { type: string, nullable: true }
+                  message: { type: string }
+        '401':
+          description: Non authentifié (JWT ou Google)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur de création
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /calendars/update:
+    post:
+      tags: [Calendars]
+      summary: Mettre à jour un événement Google Calendar (exemple statique, protégé)
+      description: >
+        Dans le code actuel, l’eventId et le contenu sont en dur (POC). À adapter pour prendre
+        `eventId` et les champs à modifier dans le body.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+      responses:
+        '200':
+          description: Mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: integer, example: 200 }
+                  message: { type: string }
+                  link: { type: string, nullable: true }
+        '401':
+          description: Non authentifié (JWT ou Google)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur MAJ
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /calendars/delete:
+    get:
+      tags: [Calendars]
+      summary: Supprimer un événement Google Calendar (protégé)
+      description: >
+        **NB**: la route actuelle est en GET mais attend `eventId` dans le **body**.
+        Il est recommandé d’utiliser DELETE `/calendars/{eventId}`.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: integer, example: 200 }
+                  message: { type: string }
+        '401':
+          description: Non authentifié (JWT ou Google)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Erreur suppression
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdPathParam:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+
+    PageParam:
+      name: page
+      in: query
+      description: Numéro de page (>=1)
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSizeParam:
+      name: pageSize
+      in: query
+      description: Taille de page (<=100)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      additionalProperties: false
+
+    UserPublic:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string, format: email }
+        role:
+          type: string
+          enum: [ADMIN, RH, RECRUITER, admin, rh, recruiter]
+      required: [id, email, role]
+
+    AuthLoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+
+    AuthRegisterRequest:
+      type: object
+      required: [email, password, role]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 6 }
+        role:
+          type: string
+          description: ADMIN | RH | RECRUITER (ou lower-case selon ta DB)
+          example: RECRUITER
+
+    AuthResponse:
+      type: object
+      properties:
+        message: { type: string }
+        token: { type: string, description: "JWT" }
+        user: { $ref: '#/components/schemas/UserPublic' }
+
+    Candidate:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        cvUrl: { type: string, nullable: true }
+        skills: { type: string }
+        experience: { type: integer }
+      required: [id, name, email, phone, skills, experience]
+
+    Interview:
+      type: object
+      properties:
+        id: { type: integer }
+        date: { type: string, format: date-time }
+        location: { type: string, nullable: true }
+        candidateId: { type: integer }
+        recruiterId: { type: integer }
+        calendarEventId: { type: string, nullable: true }
+        calendarHtmlLink: { type: string, nullable: true }
+
+    Feedback:
+      type: object
+      properties:
+        id: { type: integer }
+        interviewId: { type: integer }
+        reviewerId: { type: integer }
+        comments: { type: string }
+
+    PaginationMeta:
+      type: object
+      properties:
+        total: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalPages: { type: integer }
+
+    PaginatedCandidates:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Candidate' }
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    PaginatedFeedbacks:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Feedback' }
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'

@@ -12,7 +12,9 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.0",
     "prisma": "^6.8.2",
-    "uuid": "^11.1.0"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.1.0",
+    "yamljs": "^0.3.0"
   },
   "scripts": {
     "dev": "nodemon -L index.js",
