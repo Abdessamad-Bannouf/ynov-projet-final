@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-// Layout (Navbar + Footer via <Outlet/>)
+// Layout
 import AppLayout from "./layouts/AppLayout";
 
 // Pages
@@ -14,37 +14,36 @@ import CreateFeedback from "./pages/CreateFeedback";
 import InterviewDetail from "./pages/InterviewDetail";
 import GoogleCallback from "./pages/GoogleCallback";
 
-// 🔐 Auth
+// Auth
 import LoginPage from "./pages/Login";
+import RegisterPage from "./pages/Register"; // <= assure-toi d’avoir créé la page
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 
-// Axios instance – on rejoue le token au rafraîchissement
+// API bootstrap (Authorization header si token présent)
 import api from "./api/api";
 const saved = localStorage.getItem("token");
 if (saved) {
     api.defaults.headers.common["Authorization"] = `Bearer ${saved}`;
 }
 
-export default function App() {
+function App() {
     return (
         <AuthProvider>
             <BrowserRouter>
+                {/* On met AppLayout comme “route parente” pour TOUTES les pages */}
                 <Routes>
-                    {/* --- Routes publiques hors layout (pas de navbar/footer) --- */}
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/google/callback" element={<GoogleCallback />} />
-
-                    {/* --- Toutes les autres pages passent par le layout (Navbar + Footer) --- */}
                     <Route element={<AppLayout />}>
-                        {/* Page d'accueil -> redirige vers /interviews */}
-                        <Route index element={<Navigate to="/interviews" replace />} />
+                        {/* --- Publiques --- */}
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/google/callback" element={<GoogleCallback />} />
 
-                        {/* Routes publiques */}
+                        {/* --- Publiques (exemple) --- */}
                         <Route path="/candidates" element={<CandidatesList />} />
                         <Route path="/candidates/:id" element={<CandidateDetail />} />
 
-                        {/* --- Routes protégées --- */}
+                        {/* --- Protégées --- */}
                         <Route
                             path="/interviews"
                             element={
@@ -78,11 +77,13 @@ export default function App() {
                             }
                         />
 
-                        {/* Fallback si URL inconnue */}
-                        <Route path="*" element={<Navigate to="/interviews" replace />} />
+                        {/* Route d’accueil (optionnel) */}
+                        {/* <Route path="*" element={<Navigate to="/interviews" replace />} /> */}
                     </Route>
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
     );
 }
+
+export default App;
