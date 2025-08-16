@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+const { setupSwagger } = require('./doc/swagger');
 
 const authRoutes = require('./routes/auth');
 const protectedRoutes = require('./routes/protected');
@@ -30,6 +31,9 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false } // `true` si HTTPS
 }));
+
+// Swagger doc api
+setupSwagger(app);
 
 // Routes
 app.use('/api', authRoutes);
