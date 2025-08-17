@@ -16,6 +16,9 @@ const { requireAuth } = require('./middlewares/auth');
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 
+const sanitizeAll = require('./middlewares/sanitize');
+app.use(sanitizeAll);
+
 // Helmet + CORS
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -86,5 +89,5 @@ app.use('/api/interviews', requireAuth, interviewRoutes);
 app.get('/', (req, res) => res.send('Hello World!'));
 
 app.listen(process.env.PORT || 3000, () => {
-    console.log(`Example app listening on port ${process.env.PORT}`);
+    console.log(`Example app listening on port ${process.env.PORT || 3000}`);
 });
