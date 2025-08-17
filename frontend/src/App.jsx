@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -16,21 +16,30 @@ import GoogleCallback from "./pages/GoogleCallback";
 
 // Auth
 import LoginPage from "./pages/Login";
-import RegisterPage from "./pages/Register"; // <= assure-toi d’avoir créé la page
+import RegisterPage from "./pages/Register";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 
 // API bootstrap (Authorization header si token présent)
 import api from "./api/api";
+
 const saved = localStorage.getItem("token");
 if (saved) {
     api.defaults.headers.common["Authorization"] = `Bearer ${saved}`;
+}
+
+function BootstrapCsrf() {
+    useEffect(() => {
+        api.get("/csrf-token").catch(() => {/* ignore en dev */});
+    }, []);
+    return null;
 }
 
 function App() {
     return (
         <AuthProvider>
             <BrowserRouter>
+                <BootstrapCsrf />
                 {/* On met AppLayout comme “route parente” pour TOUTES les pages */}
                 <Routes>
                     <Route element={<AppLayout />}>
