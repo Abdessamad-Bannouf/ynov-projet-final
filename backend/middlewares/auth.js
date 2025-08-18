@@ -15,9 +15,7 @@ if (!VALID_PATTERN.test(String(JWT_EXPIRES_IN))) {
 function requireAuth(req, res, next) {
     try {
         const authHeader = req.headers['authorization'] || '';
-        console.log(authHeader);
         const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-        console.log(token);
         if (!token) return res.status(401).json({ message: 'Token manquant' });
 
         const payload = jwt.verify(token, JWT_SECRET);

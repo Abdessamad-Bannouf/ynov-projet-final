@@ -26,48 +26,61 @@ exports.show = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        const { date, location, candidateEmail } = req.body;
+        let {
+            date,
+            location,
+            candidateId,
+            candidateEmail,
+            recruiterId,
+            calendarEventId,
+            calendarHtmlLink,
+        } = req.body;
 
-        // Valide la date
+        // date valide
         const parsedDate = new Date(date);
-        if (!date || Number.isNaN(parsedDate.getTime())) {
+        if (!date || isNaN(parsedDate)) {
             return res.status(400).json({ error: "Le champ 'date' est requis et doit être une date valide." });
         }
 
-        // Récupère le recruteur depuis le JWT
-        if (!req.auth?.id) {
-            return res.status(401).json({ error: "Non authentifié" });
-        }
-        const recruiterId = Number(req.auth.id);
-
-        // Résout l'ID du candidat à partir de l'email
-        if (!candidateEmail) {
-            return res.status(400).json({ error: "Le champ 'candidateEmail' est requis." });
-        }
-        const candidate = await prisma.candidate.findUnique({
-            where: { email: candidateEmail },
-            select: { id: true, email: true, name: true },
-        });
-        if (!candidate) {
-            return res.status(400).json({ error: "Candidat introuvable pour cet email." });
+        // Résolution candidateId depuis candidateEmail si nécessaire
+        if (!candidateId && candidateEmail) {
+            const cand = await prisma.candidate.findUnique({ where: { email: candidateEmail } });
+            if (!cand) {
+                return res.status(400).json({ error: "Candidat introuvable pour cet email." });
+            }
+            candidateId = cand.id;
         }
 
-        // Crée l’entretien
-        const interview = await Interview.create(
-            {
+        // Si aucun des deux n’est fourni → 400
+        if (!candidateId) {
+            return res.status(400).json({ error: "Le champ 'candidateId' ou 'candidateEmail' est requis." });
+        }
+
+        // 4) recruiterId : par défaut l’utilisateur connecté si disponible
+        if (!recruiterId && req.auth?.id) {
+            recruiterId = req.auth.id;
+        }
+        if (!recruiterId) {
+            return res.status(400).json({ error: "Le champ 'recruiterId' est requis (ou être authentifié)." });
+        }
+
+        // création
+        const interview = await prisma.interview.create({
+            data: {
                 date: parsedDate,
-                location: location ?? null,
-                candidateId: candidate.id,
-                recruiterId,
-                calendarEventId: null,
+                location: location || null,
+                candidateId: Number(candidateId),
+                recruiterId: Number(recruiterId),
+                calendarEventId: calendarEventId || null,
+                calendarHtmlLink: calendarHtmlLink || null,
             },
-            {
+            include: {
                 candidate: { select: { id: true, name: true, email: true } },
                 recruiter: { select: { id: true, email: true } },
-            }
-        );
+            },
+        });
 
-        return res.status(201).json({ data: interview });
+        return res.status(201).json(interview);
     } catch (error) {
         console.error('Erreur lors de la création de l’entretien :', error);
         return res.status(500).json({ error: 'Erreur serveur lors de la création de l’entretien' });
