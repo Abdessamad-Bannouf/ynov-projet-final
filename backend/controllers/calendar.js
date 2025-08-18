@@ -58,7 +58,7 @@ exports.loginRedirect = async (req, res) => {
 };
 
 // create event with Google calendar
-exports.create = async (req, res, next) => {
+exports.create = async (req, res) => {
     try {
         // if (!req.session.tokens) return res.status(401).send("Not authenticated");
         if (!globalTokens) return res.status(401).send("Not authenticated");
@@ -86,19 +86,38 @@ exports.create = async (req, res, next) => {
         const eventId  = result?.data?.id || null;
         const htmlLink = result?.data?.htmlLink || null;
 
-        // ✅ Sauvegarde dans l’entretien
+        // Patch de robustesse : on essaye d’updater l’entretien si l’ID est valide,
+        // mais on ne fait pas échouer l’API si l’entretien n’existe pas.
         if (interviewId && (eventId || htmlLink)) {
-            await require('../prisma/prisma').interview.update({
-                where: { id: Number(interviewId) },
-                data:  { calendarEventId: eventId, calendarHtmlLink: htmlLink },
-            });
+            try {
+                const id = Number(interviewId);
+                // Option 1 : vérifier l’existence
+                const exists = await prisma.interview.findUnique({ where: { id } });
+                if (exists) {
+                    await prisma.interview.update({
+                        where: { id },
+                        data: {
+                            calendarEventId: eventId ?? undefined,
+                            calendarHtmlLink: htmlLink ?? undefined,
+                        },
+                    });
+                } else {
+                    console.warn('[calendar] Entretien introuvable, update ignoré', { interviewId: id });
+                }
+            } catch (e) {
+                console.warn('[calendar] Échec update entretien (ignoré)', {
+                    interviewId,
+                    error: e?.message,
+                });
+                // On n’échoue pas la création d’événement Google
+            }
         }
 
         return res.status(201).json({
             eventId,
             htmlLink,
             hangoutLink: result?.data?.hangoutLink ?? null,
-            message: 'Event created'
+            message: 'Event created',
         });
     } catch (error) {
         console.error('Erreur création événement :', error);
@@ -112,7 +131,7 @@ exports.update = async (req, res) => {
     // oauth2Client.setCredentials(req.session.tokens);
 
     if (!globalTokens) return res.status(401).send("Not authenticated");
-        oauth2Client.setCredentials(globalTokens);
+    oauth2Client.setCredentials(globalTokens);
 
     const { v4: uuidv4 } = require('uuid');
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
@@ -168,7 +187,7 @@ exports.delete = async (req, res) => {
     // oauth2Client.setCredentials(req.session.tokens);
 
     if (!globalTokens) return res.status(401).send("Not authenticated");
-        oauth2Client.setCredentials(globalTokens);
+    oauth2Client.setCredentials(globalTokens);
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
