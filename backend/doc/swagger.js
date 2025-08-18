@@ -16,7 +16,7 @@ function setupSwagger(app) {
         customSiteTitle: 'ATS API Docs',
     }));
 
-    console.log('✅ Swagger UI sur http://localhost:3000/docs');
+    console.log('Swagger UI sur http://localhost:3000/docs');
 }
 
 module.exports = { setupSwagger };

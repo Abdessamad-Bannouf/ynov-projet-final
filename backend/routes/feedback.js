@@ -9,7 +9,7 @@ const sanitize = require('../middlewares/sanitize');
 
 const router = express.Router();
 
-router.get('/interviews/:interviewId', pagination, feedbackController.getFeedbacksByInterview);
+router.get('/interviews/:interviewId', pagination, requireAuth, feedbackController.getFeedbacksByInterview);
 router.get('/reviewer/:reviewerId', requireAuth, requireRole('rh','recruiter','admin'), pagination, feedbackController.getFeedbacksByReviewer);
 router.get('/', requireAuth, requireRole('rh','recruiter','admin'), pagination, feedbackController.showAll);
 
