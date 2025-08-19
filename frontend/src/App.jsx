@@ -8,6 +8,7 @@ import AppLayout from "./layouts/AppLayout";
 // Pages
 import CandidatesList from "./pages/CandidatesList";
 import CandidateDetail from "./pages/CandidateDetail";
+import CandidateCreate from "./pages/CandidateCreate";
 import InterviewsList from "./pages/InterviewsList";
 import CreateInterview from "./pages/CreateInterview";
 import CreateFeedback from "./pages/CreateFeedback";
@@ -85,7 +86,7 @@ function App() {
                                 </PrivateRoute>
                             }
                         />
-
+                        <Route path="/candidates/new" element={<CandidateCreate />} />
                         {/* Route d’accueil (optionnel) */}
                         {/* <Route path="*" element={<Navigate to="/interviews" replace />} /> */}
                     </Route>
