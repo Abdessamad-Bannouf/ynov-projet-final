@@ -17,13 +17,13 @@ exports.create = async (req, res) => {
             data: {
                 name,
                 email,
-                experience: typeof experience === 'number' ? experience : undefined,
+                experience: parseInt(experience)
             },
         });
 
         return res.status(201).json(created);
     } catch (err) {
-        // 🔴 doublon email → 409
+        // doublon email → 409
         if (err.code === 'P2002' && err.meta?.target?.includes('email')) {
             return res.status(409).json({ error: "Email déjà utilisé." });
         }
