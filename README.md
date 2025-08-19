@@ -269,6 +269,12 @@ npx prisma migrate dev --name init
 
 
 ---
+### Inscription
+
+Créer un fichier nommé "uploads" dans le dossier backend pour stocker les CV's uploadés pour la création d'un candidat
+
+
+---
 ### 📊 Test unitaires
 
 ```
