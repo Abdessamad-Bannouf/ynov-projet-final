@@ -1,43 +1,66 @@
 const Feedback = require('../models/feedback');
 const Interview = require('../models/interview');
+const prisma = require('../prisma/prisma');
 
 exports.create = async (req, res) => {
     try {
-        const { interviewId, reviewerId, comments } = req.body;
+        const { interviewId: interviewIdRaw, comments } = req.body;
 
-        // Vérifie si l'entretien existe
-        const interview = await Interview.show(interviewId);
+        // ⚠️ le reviewerId vient de l’auth (middleware), jamais du body
+        const reviewerIdRaw = req.user?.id; // ex. mis par ton middleware JWT
+        const interviewId = Number(interviewIdRaw);
+        const reviewerId = Number(reviewerIdRaw);
+
+        if (!interviewId || !Number.isInteger(interviewId)) {
+            return res.status(400).json({ error: "interviewId invalide." });
+        }
+        if (!reviewerId || !Number.isInteger(reviewerId)) {
+            return res.status(401).json({ error: "Utilisateur non authentifié." });
+        }
+
+        // 1) Existence
+        const [interview, reviewer] = await Promise.all([
+            prisma.interview.findUnique({ where: { id: interviewId } }),
+            prisma.user.findUnique({ where: { id: reviewerId } }),
+        ]);
 
         if (!interview) {
-            return res.status(400).json({
-                error: "L'entretien spécifié n'existe pas.",
-            });
+            return res.status(400).json({ error: "L'entretien spécifié n'existe pas." });
+        }
+        if (!reviewer) {
+            return res.status(400).json({ error: "L'utilisateur connecté n'existe pas en base." });
         }
 
-        // Vérifie si un feedback existe déjà
-        const existing = await Feedback.exists(interviewId, reviewerId);
-
-        if (existing) {
-            return res.status(409).json({
-                error: "Ce recruteur a déjà laissé un feedback pour cet entretien.",
-            });
+        // 2) Unicité (tu as @@unique([interviewId, reviewerId]) dans le schéma)
+        const already = await prisma.feedback.findUnique({
+            where: { interviewId_reviewerId: { interviewId, reviewerId } },
+        });
+        if (already) {
+            return res.status(409).json({ error: "Feedback déjà déposé pour cet entretien par cet utilisateur." });
         }
 
-        // Crée le feedback
-        const feedback = await Feedback.create({ interviewId, reviewerId, comments });
+        // 3) Création via relations (plus clair que passer les IDs bruts)
+        const feedback = await prisma.feedback.create({
+            data: {
+                comments: comments ?? null,
+                interview: { connect: { id: interviewId } },
+                reviewer: { connect: { id: reviewerId } },
+            },
+        });
 
-        res.status(201).json(feedback);
+        return res.status(201).json(feedback);
     } catch (error) {
         console.error(error);
-
-        // Gestion spécifique de l’erreur Prisma P2003 (clé étrangère)
         if (error.code === 'P2003') {
             return res.status(400).json({
-                error: "Impossible de créer le feedback : la clé étrangère est invalide (entretien ou recruteur inexistant).",
+                error: "Clé étrangère invalide (entretien ou utilisateur inexistant).",
             });
         }
-
-        res.status(500).json({ error: "Erreur lors de l'enregistrement du feedback." });
+        if (error.code === 'P2002') {
+            // violation de l'unicité @@unique([interviewId, reviewerId])
+            return res.status(409).json({ error: "Feedback déjà existant pour cet entretien/utilisateur." });
+        }
+        return res.status(500).json({ error: "Erreur lors de l'enregistrement du feedback." });
     }
 };
 
