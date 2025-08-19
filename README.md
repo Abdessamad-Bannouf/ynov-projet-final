@@ -132,8 +132,9 @@ terraform apply -var-file="secrets.tfvars"
 
 ### 4. Créez des identifiants OAuth 2.0 :
 
-### 5. Créez un fichier .env :
+### 5. Créez un fichier .env et .env.test à la racine du projet backend :
 
+.env :
 ```
 PORT=3000
 CLIENT_ID="YOUR_CLIENT_ID"
@@ -142,13 +143,24 @@ REDIRECT_URL="http://localhost:3000/api/calendars/oauth2callback"
 JWT_SECRET="votre_cle_secrete"
 JWT_EXPIRES_IN="1h"
 ```
+\
+.env.test :
+```
+NODE_ENV=test
+CLIENT_ID="YOUR_CLIENT_ID"
+CLIENT_SECRET="YOUR_CLIENT_SECRET"
+REDIRECT_URL="http://localhost:3000/api/calendars/oauth2callback"
+JWT_SECRET=change_me_super_long
+SESSION_SECRET="test_session"
+JWT_EXPIRES_IN=1h
+```
 
 
 ## 📂 Configuration du dossier config pour la database
 
 ### - Créer un dossier "config" à la racine du dossier backend.
 
-#### - Ensuite dans ce dossier créer un fichier .env et rajouter les lignes suivantes :
+#### - Ensuite dans ce dossier créer un fichier .env dans le dossier "config" et rajouter les lignes suivantes :
 
 ```
 POSTGRES_USER=postgres
@@ -156,14 +168,14 @@ POSTGRES_DB=postgres
 PGADMIN_DEFAULT_EMAIL=admin@domain.com
 ```
 
-### Créer un autre .env mais cette fois-ci à la racine du dossier backend lui-même (primordial pour que Prisma s'exécute correctement)
+### Aller dans les .env précédemment crées qui se trouvent à la racine du dossier backend lui-même (primordial pour que Prisma s'exécute correctement)
 - Copier cette ligne avec les valeurs suivantes :
 
 ```
 DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres?schema=public"
 ```
 
-### - Créer un fichier "db_password.txt" à la racine du projet.
+### - Créer un fichier "db_password.txt" dans le dossier config.
 
 #### - Ensuite dans ce fichier ajouter la mot de passe de la base de données suivant :
 
@@ -171,7 +183,7 @@ DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres?schema=publi
 postgres
 ```
 
-### - Créer un fichier "pgadmin_password.txt" à la racine du projet.
+### - Créer un fichier "pgadmin_password.txt" dans le dossier config.
 
 #### - Ensuite dans ce fichier ajouter le mot de passe de pg admin suivant :
 
@@ -249,20 +261,30 @@ docker exec -it expressjs bash
 npx prisma migrate dev --name init
 ```
 
+
 ### Inscription
 
-- Aller sur l'url localhost:4000/register et s'inscrire
-- Se connecter via l'url localhost:3000/login
+- Aller sur l'url localhost:5173/register et s'inscrire
+- Se connecter via l'url localhost:5173/login
+
+
+---
+### 📊 Test unitaires
+
+```
+docker exec -it expressjs bash
+npm test
+```
+
 
 ---
 
 ## 📌 Notes
 
-L'application est exposée sur le port 3000. Vous pouvez y accéder via http://localhost:3000.
-Si vous modifiez le code, techniquement les changements seront raffraichis automatiquement grâce à Nodemon.
+Le backend est exposée sur le port 3000 et le frontend sur le port 5173. Vous pouvez donc accéder à l'application via http://localhost:5173.
+Si vous modifiez le code côté back, techniquement les changements seront raffraichis automatiquement grâce à Nodemon, et pareil pour le front tout sera synchronisé.
 
 ---
-
 ## 🛠 Technologies utilisées
 
 - Node.js avec Express.js pour le backend.
@@ -271,6 +293,7 @@ Si vous modifiez le code, techniquement les changements seront raffraichis autom
 - PrismaORM pour tout ce qui est communication avec la base de données
 - ReactJS pour le front
 - Docker pour la conteneurisation.
+
 
 ## Technologies
 ***
